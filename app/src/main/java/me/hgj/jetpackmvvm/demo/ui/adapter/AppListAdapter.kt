@@ -31,9 +31,12 @@ class AppListAdapter(data: MutableList<AppListBean>) :
     override fun convert(holder: BaseViewHolder, item: AppListBean) {
         item.run {
             holder.setText(R.id.app_name, item.appName)
+            holder.setText(R.id.app_id, item.app_id?.toString())
+            holder.setText(R.id.app_package_name, item.packageName)
             holder.getView<ImageView>(R.id.app_icon).loadAppIcon(item.icon_url)
         }
     }
+
     fun setCollectClick(inputCollectAction: (item: AriticleResponse, v: CollectView, position: Int) -> Unit) {
     }
 
