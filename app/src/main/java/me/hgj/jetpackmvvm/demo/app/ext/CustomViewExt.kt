@@ -30,6 +30,7 @@ import com.yanzhenjie.recyclerview.SwipeRecyclerView
 import me.hgj.jetpackmvvm.base.appContext
 import me.hgj.jetpackmvvm.demo.R
 import me.hgj.jetpackmvvm.demo.app.network.stateCallback.ListDataUiState
+import me.hgj.jetpackmvvm.demo.app.network.stateCallback.ListDataUiStateM
 import me.hgj.jetpackmvvm.demo.app.util.SettingUtil
 import me.hgj.jetpackmvvm.demo.app.weight.loadCallBack.EmptyCallback
 import me.hgj.jetpackmvvm.demo.app.weight.loadCallBack.ErrorCallback
@@ -39,6 +40,7 @@ import me.hgj.jetpackmvvm.demo.app.weight.viewpager.ScaleTransitionPagerTitleVie
 import me.hgj.jetpackmvvm.demo.data.model.bean.ClassifyResponse
 import me.hgj.jetpackmvvm.demo.ui.fragment.home.HomeFragment
 import me.hgj.jetpackmvvm.demo.ui.fragment.me.MeFragment
+import me.hgj.jetpackmvvm.demo.ui.fragment.mongo.AppListFragment
 import me.hgj.jetpackmvvm.demo.ui.fragment.project.ProjectFragment
 import me.hgj.jetpackmvvm.demo.ui.fragment.publicNumber.PublicNumberFragment
 import me.hgj.jetpackmvvm.demo.ui.fragment.tree.TreeArrFragment
@@ -332,7 +334,7 @@ fun ViewPager2.initMain(fragment: Fragment): ViewPager2 {
         override fun createFragment(position: Int): Fragment {
             when (position) {
                 0 -> {
-                    return HomeFragment()
+                    return AppListFragment()
                 }
                 1 -> {
                     return ProjectFragment()
@@ -407,6 +409,47 @@ fun hideSoftKeyboard(activity: Activity?) {
  */
 fun <T> loadListData(
     data: ListDataUiState<T>,
+    baseQuickAdapter: BaseQuickAdapter<T, *>,
+    loadService: LoadService<*>,
+    recyclerView: SwipeRecyclerView,
+    swipeRefreshLayout: SwipeRefreshLayout
+) {
+    swipeRefreshLayout.isRefreshing = false
+    recyclerView.loadMoreFinish(data.isEmpty, data.hasMore)
+    if (data.isSuccess) {
+        //成功
+        when {
+            //第一页并没有数据 显示空布局界面
+            data.isFirstEmpty -> {
+                loadService.showEmpty()
+            }
+            //是第一页
+            data.isRefresh -> {
+                baseQuickAdapter.setList(data.listData)
+                loadService.showSuccess()
+            }
+            //不是第一页
+            else -> {
+                baseQuickAdapter.addData(data.listData)
+                loadService.showSuccess()
+            }
+        }
+    } else {
+        //失败
+        if (data.isRefresh) {
+            //如果是第一页，则显示错误界面，并提示错误信息
+            loadService.showError(data.errMessage)
+        } else {
+            recyclerView.loadMoreError(0, data.errMessage)
+        }
+    }
+}
+
+/**
+ * 加载列表数据
+ */
+fun <T> loadListDataM(
+    data: ListDataUiStateM<T>,
     baseQuickAdapter: BaseQuickAdapter<T, *>,
     loadService: LoadService<*>,
     recyclerView: SwipeRecyclerView,

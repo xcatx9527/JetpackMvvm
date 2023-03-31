@@ -2,9 +2,9 @@ apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
 
-apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-parcelize'
 
 android {
     compileSdkVersion 30
@@ -15,7 +15,6 @@ android {
         targetSdkVersion 30
         versionCode 27
         versionName "1.2.7"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
       /* ndk {
             // 设置支持的SO库架构
             abiFilters 'armeabi','armeabi-v7a'
@@ -28,10 +27,7 @@ android {
         viewBinding = true
     }
 
-    //使用Kotlin实验特性
-    androidExtensions {
-        experimental = true
-    }
+
     buildTypes {
         debug {
             minifyEnabled false
@@ -131,4 +127,8 @@ dependencies {
     implementation 'me.jessyan:autosize:1.2.1'
     //防崩溃
     implementation 'cat.ereza:customactivityoncrash:2.3.0'
+    // https://mvnrepository.com/artifact/org.litote.kmongo/kmongo
+    implementation group: 'org.litote.kmongo', name: 'kmongo', version: '4.2.4'
+
+    implementation 'com.orhanobut:logger:2.2.0'
 }
